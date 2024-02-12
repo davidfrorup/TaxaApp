@@ -14,7 +14,7 @@
 </div>
 <div>
     <label for="SlutAdresse">Slut destination:</label>
-    <input id="SlutAdresse" placeholder="Vælg slutdestination på kortet" @bind="Taxatur.SlutAdresse" />
+    <input id="SlutAdresse" placeholder="Vælg slutdestination på kortet" @bind="Taxatur.SlutAdresse" @bind:event="onchange" />
 </div>
 
 <div>
@@ -22,7 +22,7 @@
     <select id="VognType" @bind="Taxatur.VognType">
         <option value="Almindelig vogn">Almindelig vogn</option>
         <option value="Stor vogn">Stor vogn</option>
-        <!-- Add more car types as needed -->
+        <!-- Tilføj flere biltyper efter behov -->
     </select>
 </div>
 <div>
@@ -34,39 +34,43 @@
     <input id="HarLiftvogn" type="checkbox" @bind="Taxatur.HarLiftvogn" />
 </div>
 
-<button @onclick="CalculatePrice">Udregn Pris</button>
+<button @onclick="UdregnPris">Udregn Pris</button>
 
 <div>
     <label>Pris:</label>
-    <span>@TotalPris DKK</span>
+    <span>@PrisInfo.TotalPris DKK</span>
 </div>
 
 @code {
     private Taxatur Taxatur = new Taxatur();
-    private PrisUdregner PrisUdregner = new PrisUdregner();
-    private decimal TotalPris = 0.0m;
+    private PrisUdregner PrisUdregner;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private PrisUdregner.PrisInformation PrisInfo = new PrisUdregner.PrisInformation();
+
+    public Index()
     {
-        if (firstRender)
-        {
-            // Kald AddGoogleMapsScript når DOM'en er klar
-            await JSRuntime.InvokeVoidAsync("AddGoogleMapsScript", "YOUR_API_KEY");
-
-            // Vent et kort øjeblik for at sikre, at scriptet indlæses, før du initialiserer Google Maps
-            await Task.Delay(500);
-
-            // Initialiser Google Maps-boxen (du skal tilpasse dette afhængigt af dit specifikke behov)
-            await JSRuntime.InvokeVoidAsync("InitializeGoogleMap");
-        }
+        PrisUdregner = new PrisUdregner();
     }
 
-    private async Task CalculatePrice()
-    {
-        // Hent afstanden fra Google Maps
-        Taxatur.DistanceIKm = await MapsService.GetDistanceInKm(Taxatur.StartAdresse, Taxatur.SlutAdresse);
+    private async Task UdregnPris()
+{
+    // Hent afstanden fra Google Maps
+    int distanceInKm = await MapsService.GetDistanceIKm(Taxatur.StartAdresse, Taxatur.SlutAdresse);
 
-        // Beregn prisen ved at bruge PrisUdregner
-        TotalPris = Convert.ToDecimal(PrisUdregner.Pris(Taxatur));
-    }
+    // Opdater afstanden i Taxatur
+    Taxatur.DistanceIKm = distanceInKm;
+
+    // Signaler, at komponentens tilstand er ændret
+    StateHasChanged();
+
+    // Beregn prisen ved at bruge PrisUdregnerService
+    PrisInfo = PrisUdregner.UdregnPris(Taxatur);
+
+    // Vis mellemværdier i konsollen
+    Console.WriteLine($"Afstand: {Taxatur.DistanceIKm} km");
+    Console.WriteLine($"StartPris: {PrisInfo.StartPris}");
+    Console.WriteLine($"KilometerPris: {PrisInfo.KilometerPris}");
+    Console.WriteLine($"MinutPris: {PrisInfo.MinutPris}");
+    Console.WriteLine($"TotalPris: {PrisInfo.TotalPris}");
+}
 }
