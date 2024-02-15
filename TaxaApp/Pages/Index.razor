@@ -3,6 +3,12 @@
 @inject GoogleMapsService MapsService
 @inject IJSRuntime JSRuntime
 
+
+<iframe width="600" height="450" style="border:0" loading="lazy" allowfullscreen
+src="https://www.google.com/maps/embed/v1/view?zoom=11&center=55.6761%2C12.5683&key=AIzaSyAMX2xaib8pawKfNoBlzSSFy5tCzo3RI7g"></iframe>
+
+
+
 <h3>Taxa prisudregner</h3>
 
 <!-- Google Maps-box -->
@@ -43,8 +49,7 @@
 
 @code {
     private Taxatur Taxatur = new Taxatur();
-    private PrisUdregner PrisUdregner;
-
+    private PrisUdregner PrisUdregner { get; set; }
     private PrisUdregner.PrisInformation PrisInfo = new PrisUdregner.PrisInformation();
 
     public Index()
@@ -53,24 +58,25 @@
     }
 
     private async Task UdregnPris()
-{
-    // Hent afstanden fra Google Maps
-    int distanceInKm = await MapsService.GetDistanceIKm(Taxatur.StartAdresse, Taxatur.SlutAdresse);
+    {
+        // Hent afstanden fra Google Maps
+        int distanceInKm = await MapsService.GetDistanceIKm(Taxatur.StartAdresse, Taxatur.SlutAdresse);
 
-    // Opdater afstanden i Taxatur
-    Taxatur.DistanceIKm = distanceInKm;
 
-    // Signaler, at komponentens tilstand er ændret
-    StateHasChanged();
 
-    // Beregn prisen ved at bruge PrisUdregnerService
-    PrisInfo = PrisUdregner.UdregnPris(Taxatur);
 
-    // Vis mellemværdier i konsollen
-    Console.WriteLine($"Afstand: {Taxatur.DistanceIKm} km");
-    Console.WriteLine($"StartPris: {PrisInfo.StartPris}");
-    Console.WriteLine($"KilometerPris: {PrisInfo.KilometerPris}");
-    Console.WriteLine($"MinutPris: {PrisInfo.MinutPris}");
-    Console.WriteLine($"TotalPris: {PrisInfo.TotalPris}");
-}
+        // Opdater afstanden i Taxatur
+        Taxatur.DistanceIKm = distanceInKm;
+
+        // Beregn prisen ved at bruge PrisUdregnerService
+        PrisInfo = PrisUdregner.UdregnPris(Taxatur);
+
+        // Vis mellemværdier i konsollen
+        Console.WriteLine($"Afstand: {Taxatur.DistanceIKm} km");
+        Console.WriteLine($"StartPris: {PrisInfo.StartPris}");
+        Console.WriteLine($"KilometerPris: {PrisInfo.KilometerPris}");
+        Console.WriteLine($"MinutPris: {PrisInfo.MinutPris}");
+        Console.WriteLine($"TotalPris: {PrisInfo.TotalPris}");
+
+    }
 }

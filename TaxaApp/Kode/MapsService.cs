@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace TaxaApp.Kode
 {
@@ -17,23 +18,25 @@ namespace TaxaApp.Kode
         {
             try
             {
-                string apiKey = "AIzaSyAMX2xaib8pawKfNoBlzSSFy5tCzo3RI7g"; // Erstat med din faktiske API-nøgle
+                string apiKey = "AIzaSyAMX2xaib8pawKfNoBlzSSFy5tCzo3RI7g"; // Replace with your actual API key
                 string apiUrl = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={startAddress}&destinations={destinationAddress}&key={apiKey}";
 
                 var response = await _httpClient.GetStringAsync(apiUrl);
 
-                var distanceIndex = response.IndexOf("\"value\"");
-                if (distanceIndex != -1)
+                using (var jsonDoc = JsonDocument.Parse(response))
                 {
-                    distanceIndex = response.IndexOf(":", distanceIndex) + 1;
-                    var distanceEndIndex = response.IndexOf(",", distanceIndex);
-
-                    if (distanceEndIndex != -1 && int.TryParse(response.Substring(distanceIndex, distanceEndIndex - distanceIndex), out int distanceInMeters))
+                    var rows = jsonDoc.RootElement.GetProperty("rows");
+                    if (rows.EnumerateArray().Any())
                     {
-                        int distanceInKm = distanceInMeters / 1000;
+                        var elements = rows[0].GetProperty("elements");
+                        if (elements.EnumerateArray().Any())
+                        {
+                            var distance = elements[0].GetProperty("distance").GetProperty("value").GetInt32();
+                            int distanceInKm = distance! / 1000;
 
-                        Console.WriteLine($"Afstand: {distanceInKm} km");
-                        return distanceInKm;
+                            Console.WriteLine($"Afstand: {distanceInKm} km");
+                            return distanceInKm;
+                        }
                     }
                 }
 

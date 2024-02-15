@@ -61,6 +61,11 @@ namespace TaxaApp.Kode
             }
 
             return prisInfo;
+
+
+
+
+
         }
     }
 }
