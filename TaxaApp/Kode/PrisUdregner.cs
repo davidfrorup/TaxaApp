@@ -10,6 +10,13 @@ namespace TaxaApp.Kode
             public double KilometerPris { get; set; }
             public double MinutPris { get; set; }
             public double TotalPris { get; set; }
+
+
+            public double DistanceIKm { get; set; }
+            public string DistanceText { get; set; }
+            public string DurationText { get; set; }
+
+
         }
 
         public PrisInformation UdregnPris(Taxatur taxatur)
@@ -47,8 +54,7 @@ namespace TaxaApp.Kode
                 }
             }
 
-            // Opdateret: Brug afstand fra taxatur
-            prisInfo.TotalPris = prisInfo.StartPris + (taxatur.DistanceIKm * prisInfo.KilometerPris);
+            prisInfo.TotalPris = prisInfo.StartPris + (prisInfo.DistanceIKm * prisInfo.KilometerPris);
 
             if (taxatur.HarCykel)
             {
@@ -61,9 +67,6 @@ namespace TaxaApp.Kode
             }
 
             return prisInfo;
-
-
-
 
 
         }

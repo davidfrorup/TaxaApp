@@ -6,14 +6,16 @@
 
         public string StartAdresse { get; set; }
         public string SlutAdresse { get; set; }
-        public int DistanceIKm { get; set; }
+        public double DistanceIKm { get; set; }
         public string VognType { get; set; }
-        public String Tidspunkt { get; set; }
+        public string Tidspunkt { get; set; }
         public bool HarCykel { get; set; }
         public bool HarLiftvogn { get; set; }
-        
-        
-    
+
+        public string? MapUrl { get; set; }
+
+        public string? DistanceResult { get; set; }
+
 
     }
 }
