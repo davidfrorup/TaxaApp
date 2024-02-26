@@ -94,46 +94,42 @@ namespace TaxaApp.Kode
 
         private bool ErHelligdag(DateTime tidspunkt)
         {
-        
-            // Hvis det er søndag, betragt det som en helligdag
-            if (tidspunkt.DayOfWeek == DayOfWeek.Sunday)
-            {
-                return true;
-            }
 
-            // Du kan tilføje yderligere betingelser baseret på kendte helligdage
-            // Eksempelvis:
+            //    if (tidspunkt.DayOfWeek == DayOfWeek.Sunday)
+            //    {
+            //        return true;
+            //    }
 
-            
-            if (tidspunkt.Month == 12 && tidspunkt.Day == 31)
-            {
-                return true;
-            }
 
-            
-            if (tidspunkt.Month == 12 && tidspunkt.Day == 24)
-            {
-                return true;
-            }
+            //    if (tidspunkt.Month == 12 && tidspunkt.Day == 31)
+            //    {
+            //        return true;
+            //    }
 
-            // ... (tilføj andre helligdage efter behov)
+
+            //    if (tidspunkt.Month == 12 && tidspunkt.Day == 24)
+            //    {
+            //        return true;
+            //    }
+
+            //    // ... (tilføj andre helligdage efter behov)
 
             return false;
         }
 
         private bool ErJuleaften(DateTime tidspunkt)
         {
-            return tidspunkt.Month == 12 && tidspunkt.Day == 24;
+            if (tidspunkt.Month == 12 && tidspunkt.Day == 24)
+            {
+                return false;
+            }
+            return true;
         }
 
         private bool ErNytårsaften(DateTime tidspunkt)
         {
             return tidspunkt.Month == 12 && tidspunkt.Day == 31;
         }
-
-
-
-
 
     }
 }
