@@ -31,6 +31,12 @@
         <!-- Tilføj flere biltyper efter behov -->
     </select>
 </div>
+
+<div>
+    <label for="ValgtTidspunkt">Vælg tidspunkt:</label>
+    <input type="datetime-local" id="ValgtTidspunkt" @bind="Taxatur.Tidspunkt" />
+</div>
+
 <div>
     <label for="HarCykel">Cykel:</label>
     <input id="HarCykel" type="checkbox" @bind="Taxatur.HarCykel" />
@@ -43,8 +49,11 @@
 <button @onclick="UdregnPris">Udregn Pris</button>
 
 <div>
-    <label>Pris:</label>
-    <span>@Taxatur.DistanceResult DKK</span>
+    <span>@Taxatur.DistanceResult</span>
+</div>
+
+<div>
+    <span>@Taxatur.TimeResult</span>
 </div>
 
 @code {
@@ -74,29 +83,36 @@
                 string duration = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.duration?.text;
 
                 // Konverter afstand og varighed til numeriske værdier
-                double distanceIKm = double.Parse(distance?.Replace(" km", ""));
-                double durationInMin = double.Parse(duration?.Replace(" mins", ""));
+                double distanceIKm = double.Parse(distance?.Replace(" km", "").Replace(".", ","));
+                
+                double durationIMin = double.Parse(duration?.Replace(" mins", ""));
 
                 // Brug disse værdier til at beregne prisen
-                Taxatur.DistanceIKm = distanceIKm;
-                PrisInfo.DistanceText = distance;
-                PrisInfo.DurationText = duration;
+                //Taxatur.DistanceIKm = distanceIKm;
+                //Taxatur.durationIMin = durationIMin;
+                //PrisInfo.DistanceText = distance;
+                //PrisInfo.DurationText = duration;
 
                 // Resten af din eksisterende prisberegning logik
                 PrisInfo = PrisUdregner.UdregnPris(Taxatur);
 
                 double totalPris = PrisInfo.StartPris + (distanceIKm * PrisInfo.KilometerPris);
+                double totalTidsPris = PrisInfo.StartPris + durationIMin * PrisInfo.MinutPris;
+
+
                 //startPrice + (distanceInKm * pricePerKm) + (durationInMin * pricePerMin) + cykelTillæg + opbæringTillæg + lufthavnTillæg + passagerTillæg + liftvognTillæg + broTillæg;
-                               
-                Taxatur.DistanceResult = distance != null ? $"afstand: {distance}, tid: {duration}, pris: {totalPris}" : "";
 
-                Taxatur.MapUrl = $"https://www.google.com/maps/embed/v1/directions?key=AIzaSyBH1LLJchXHqhquPfqwe8KUCcc2yu7HWG0&origin={Taxatur.StartAdresse}&destination={Taxatur.SlutAdresse}";
+                Taxatur.DistanceResult = distance != null ? $"Afstand: {distance}, Pris: {totalPris} DKK" : "";
+                Taxatur.TimeResult = duration != null ? $"Tid: {duration}, Pris: {totalTidsPris} DKK" : "";
 
-                Console.WriteLine($"Afstand: {Taxatur.DistanceIKm} km");
+                Taxatur.MapUrl = $"https://www.google.com/maps/embed/v1/directions?key=AIzaSyAMX2xaib8pawKfNoBlzSSFy5tCzo3RI7g&origin={Taxatur.StartAdresse}&destination={Taxatur.SlutAdresse}";
+
+                Console.WriteLine($"Afstand: {distanceIKm} km");
                 Console.WriteLine($"StartPris: {PrisInfo.StartPris}");
                 Console.WriteLine($"KilometerPris: {PrisInfo.KilometerPris}");
                 Console.WriteLine($"MinutPris: {PrisInfo.MinutPris}");
                 Console.WriteLine($"TotalPris: {totalPris}");
+                Console.WriteLine($"Afstand fra API: {distance}");
 
 
             }
