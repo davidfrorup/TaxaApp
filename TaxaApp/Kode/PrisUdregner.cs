@@ -10,6 +10,7 @@ namespace TaxaApp.Kode
             public double KilometerPris { get; set; }
             public double MinutPris { get; set; }
             public double TotalPris { get; set; }
+            public double TotalTidsPris { get; set; }
             public double DistanceIKm { get; set; }
             public double durationIMin { get; set; }
             public string? DistanceText { get; set; }
@@ -18,7 +19,7 @@ namespace TaxaApp.Kode
 
         }
 
-        public PrisInformation UdregnPris(Taxatur taxatur)
+        public PrisInformation UdregnPris(Taxatur taxatur, double distanceIKm, double durationIMin)
         {
             PrisInformation prisInfo = new PrisInformation();
 
@@ -53,16 +54,20 @@ namespace TaxaApp.Kode
                 }
             }
 
-            prisInfo.TotalPris = prisInfo.StartPris + (prisInfo.DistanceIKm * prisInfo.KilometerPris);
+            prisInfo.TotalPris = prisInfo.StartPris + (distanceIKm * prisInfo.KilometerPris);
+            prisInfo.TotalTidsPris = prisInfo.StartPris + (durationIMin * prisInfo.MinutPris);
+
 
             if (taxatur.HarCykel)
             {
                 prisInfo.TotalPris += 30;
+                prisInfo.TotalTidsPris += 30;
             }
 
             if (taxatur.HarLiftvogn)
             {
                 prisInfo.TotalPris += 350;
+                prisInfo.TotalTidsPris += 350;
             }
 
 
@@ -72,63 +77,51 @@ namespace TaxaApp.Kode
 
         private bool ErDagtimer(DateTime tidspunkt)
         {
-            // Kontroller om det er dagtimer (mandag-fredag kl. 06-18)
-            if (tidspunkt.DayOfWeek >= DayOfWeek.Monday && tidspunkt.DayOfWeek <= DayOfWeek.Friday
-                && tidspunkt.Hour >= 6 && tidspunkt.Hour < 18)
+            // Kontroller for specifikke datoer (juleaften og nytårsaften)
+            if (ErJuleaften(tidspunkt) || ErNytårsaften(tidspunkt))
             {
-                return true;
+                return false; // Aftenpriser for specifikke datoer
             }
 
-            // Kontroller om det er nat (helligdag, d. 24. december, d. 31. december,
-            // mandag-fredag kl. 18-06 og lørdag-søndag kl. 00-24)
-            if (ErHelligdag(tidspunkt) || ErJuleaften(tidspunkt) || ErNytårsaften(tidspunkt)
-                || (tidspunkt.DayOfWeek >= DayOfWeek.Monday && tidspunkt.DayOfWeek <= DayOfWeek.Friday
-                    && (tidspunkt.Hour >= 18 || tidspunkt.Hour < 6))
-                || (tidspunkt.DayOfWeek == DayOfWeek.Saturday || tidspunkt.DayOfWeek == DayOfWeek.Sunday))
+            
+            // Kontroller ugedag og tidspunkt
+            if (tidspunkt.DayOfWeek >= DayOfWeek.Monday && tidspunkt.DayOfWeek <= DayOfWeek.Friday)
             {
-                return false;
+                if (tidspunkt.Hour >= 6 && tidspunkt.Hour < 18)
+                {
+                    return true; // Dagtimer for mandag til fredag
+                }
             }
 
-            return true;
-        }
+            // Lørdag og søndag er altid nat
+            if (tidspunkt.DayOfWeek == DayOfWeek.Saturday || tidspunkt.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return false; // Nat for lørdag og søndag
+            }
 
-        private bool ErHelligdag(DateTime tidspunkt)
-        {
-
-            //    if (tidspunkt.DayOfWeek == DayOfWeek.Sunday)
-            //    {
-            //        return true;
-            //    }
-
-
-            //    if (tidspunkt.Month == 12 && tidspunkt.Day == 31)
-            //    {
-            //        return true;
-            //    }
-
-
-            //    if (tidspunkt.Month == 12 && tidspunkt.Day == 24)
-            //    {
-            //        return true;
-            //    }
-
-            //    // ... (tilføj andre helligdage efter behov)
-
+            // Aften for alle andre tidspunkter
             return false;
         }
 
+        // Eksempelfunktioner til at tjekke for specifikke datoer
         private bool ErJuleaften(DateTime tidspunkt)
         {
             if (tidspunkt.Month == 12 && tidspunkt.Day == 24)
             {
-                return false;
+                return true;
             }
-            return true;
+
+            return false;
         }
 
         private bool ErNytårsaften(DateTime tidspunkt)
         {
-            return tidspunkt.Month == 12 && tidspunkt.Day == 31;
+            if (tidspunkt.Month == 12 && tidspunkt.Day == 31)
+            {
+                return true;
+            }
+
+            return false;
         }
 
     }
