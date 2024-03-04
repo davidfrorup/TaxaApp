@@ -5,8 +5,10 @@
 @inject GoogleMapsService MapsService
 @inject IJSRuntime JSRuntime
 
+
 <iframe width="1200" height="550" style="border:0" loading="lazy" allowfullscreen
         src="@Taxatur.MapUrl"></iframe>
+
 
 <h3>Taxa prisudregner</h3>
 
@@ -18,12 +20,12 @@
 
 </div>
 <div>
-    <label for="SlutAdresse">Slut destination:  </label>
+    <label for="SlutAdresse">Slut destination:</label>
     <input id="SlutAdresse" placeholder="Vælg slutdestination på kortet" @bind="Taxatur.SlutAdresse" @bind:event="onchange" />
 </div>
 
 <div>
-    <label for="VognType">Vogntype:             </label>
+    <label for="VognType">Vogntype:</label>
     <select id="VognType" @bind="Taxatur.VognType">
         <option value="Almindelig vogn" default>Almindelig vogn</option>
         <option value="Stor vogn">Stor vogn</option>
@@ -32,7 +34,7 @@
 </div>
 
 <div>
-    <label for="ValgtTidspunkt">Vælg tidspunkt: </label>
+    <label for="ValgtTidspunkt">Vælg tidspunkt:</label>
     <input type="datetime-local" id="ValgtTidspunkt" @bind="Taxatur.Tidspunkt" />
 </div>
 
@@ -71,52 +73,56 @@
     {
         try
         {
-           
+
             var response = await MapsService.GetDistance(Taxatur.StartAdresse, Taxatur.SlutAdresse);
 
             if (response != null)
             {
-               
+
                 var result = JsonSerializer.Deserialize<GoogleMapsDistanceMatrixResponse>(response);
 
-                
+
                 string distance = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.distance?.text;
                 string duration = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.duration?.text;
 
-                
+
                 double distanceIKm = double.Parse(distance?.Replace(" km", "").Replace(".", ","));
-                
+
                 double durationIMin = double.Parse(duration?.Replace(" mins", ""));
 
 
                 PrisInfo = PrisUdregner.UdregnPris(Taxatur, distanceIKm, durationIMin);
 
-                Taxatur.DistanceResult = distance != null ? $"Afstand: {distance}, Pris: {PrisInfo.TotalPris} DKK" : "";
-                Taxatur.TimeResult = duration != null ? $"Tid: {duration}, Pris: {PrisInfo.TotalTidsPris} DKK" : "";
+                Taxatur.DistanceResult = distance != null ? $"Afstand: {distance} - Pris: {PrisInfo.TotalPris} DKK" : "";
+                Taxatur.TimeResult = duration != null ? $"Tid: {durationIMin} min - Pris: {PrisInfo.TotalTidsPris} DKK" : "";
 
                 Taxatur.MapUrl = $"https://www.google.com/maps/embed/v1/directions?key=AIzaSyAMX2xaib8pawKfNoBlzSSFy5tCzo3RI7g&origin={Taxatur.StartAdresse}&destination={Taxatur.SlutAdresse}";
 
                 Console.WriteLine($"Afstand: {distanceIKm} km");
+                Console.WriteLine($"Afstand: {durationIMin} min");
                 Console.WriteLine($"StartPris: {PrisInfo.StartPris}");
+                Console.WriteLine($"Cykel: {Taxatur.HarCykel}");
+                Console.WriteLine($"Liftvogn: {Taxatur.HarLiftvogn}");
                 Console.WriteLine($"KilometerPris: {PrisInfo.KilometerPris}");
                 Console.WriteLine($"MinutPris: {PrisInfo.MinutPris}");
-                Console.WriteLine($"TotalPris: {PrisInfo.TotalPris}");
-                Console.WriteLine($"TotalPris: {PrisInfo.TotalTidsPris}");
+                Console.WriteLine($"TotalPris i km: {PrisInfo.TotalPris}");
+                Console.WriteLine($"TotalPris i min: {PrisInfo.TotalTidsPris}");
                 Console.WriteLine($"Afstand fra API: {distance}");
+                Console.WriteLine($"Afstand fra API: {duration}");
 
 
 
             }
             else
             {
-               
+
                 Console.WriteLine("Fejl: Ugyldigt svar fra API'en.");
-  
+
             }
         }
         catch (Exception ex)
         {
-       
+
             Console.WriteLine($"Fejl: {ex.Message}");
 
         }

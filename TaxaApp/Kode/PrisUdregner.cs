@@ -77,52 +77,33 @@ namespace TaxaApp.Kode
 
         private bool ErDagtimer(DateTime tidspunkt)
         {
-            // Kontroller for specifikke datoer (juleaften og nytårsaften)
-            if (ErJuleaften(tidspunkt) || ErNytårsaften(tidspunkt))
+
+            if (tidspunkt.Month == 12 && tidspunkt.Day == 24 || tidspunkt.Month == 12 && tidspunkt.Day == 31)
             {
-                return false; // Aftenpriser for specifikke datoer
+                return false;
             }
 
-            
-            // Kontroller ugedag og tidspunkt
+
+
             if (tidspunkt.DayOfWeek >= DayOfWeek.Monday && tidspunkt.DayOfWeek <= DayOfWeek.Friday)
             {
                 if (tidspunkt.Hour >= 6 && tidspunkt.Hour < 18)
                 {
-                    return true; // Dagtimer for mandag til fredag
+                    return true;
                 }
             }
 
-            // Lørdag og søndag er altid nat
+
             if (tidspunkt.DayOfWeek == DayOfWeek.Saturday || tidspunkt.DayOfWeek == DayOfWeek.Sunday)
             {
-                return false; // Nat for lørdag og søndag
+                return false;
             }
 
-            // Aften for alle andre tidspunkter
-            return false;
-        }
-
-        // Eksempelfunktioner til at tjekke for specifikke datoer
-        private bool ErJuleaften(DateTime tidspunkt)
-        {
-            if (tidspunkt.Month == 12 && tidspunkt.Day == 24)
-            {
-                return true;
-            }
 
             return false;
         }
 
-        private bool ErNytårsaften(DateTime tidspunkt)
-        {
-            if (tidspunkt.Month == 12 && tidspunkt.Day == 31)
-            {
-                return true;
-            }
 
-            return false;
-        }
 
     }
 }
