@@ -24,7 +24,7 @@
 
         public class GoogleMapsDistanceMatrixText
         {
-            public string? text { get; set; }
+            public double? value { get; set; }
         }
 
 

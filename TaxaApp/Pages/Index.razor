@@ -27,7 +27,8 @@
 <div>
     <label for="VognType">Vogntype:</label>
     <select id="VognType" @bind="Taxatur.VognType">
-        <option value="Almindelig vogn" default>Almindelig vogn</option>
+        <option value="Intet valgt">Intet valgt</option>
+        <option value="Almindelig vogn">Almindelig vogn</option>
         <option value="Stor vogn">Stor vogn</option>
         <!-- Tilføj flere biltyper efter behov -->
     </select>
@@ -82,19 +83,26 @@
                 var result = JsonSerializer.Deserialize<GoogleMapsDistanceMatrixResponse>(response);
 
 
-                string distance = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.distance?.text;
-                string duration = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.duration?.text;
+                double distance = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.distance?.value ?? 0;
+                double duration = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.duration?.value ?? 0;
 
 
-                double distanceIKm = double.Parse(distance?.Replace(" km", "").Replace(".", ","));
+                //  string distance = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.distance?.value;
+                //  string duration = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.duration?.value;
 
-                double durationIMin = double.Parse(duration?.Replace(" mins", ""));
+
+                //  double distanceIKm = double.Parse(distance?.Replace(" km", "").Replace(".", ","));
+
+                //  double durationIMin = double.Parse(duration?.Replace(" mins", ""));
+
+                double distanceIKm = distance / 1000;
+                double durationIMin = duration / 60;
 
 
                 PrisInfo = PrisUdregner.UdregnPris(Taxatur, distanceIKm, durationIMin);
 
-                Taxatur.DistanceResult = distance != null ? $"Afstand: {distance} - Pris: {PrisInfo.TotalPris} DKK" : "";
-                Taxatur.TimeResult = duration != null ? $"Tid: {durationIMin} min - Pris: {PrisInfo.TotalTidsPris} DKK" : "";
+                Taxatur.DistanceResult = distance != null ? $"Afstand: {distanceIKm:N1} km - Pris: {PrisInfo.TotalPris:N0} DKK" : "";
+                Taxatur.TimeResult = duration != null ? $"Tid: {durationIMin:N0} min - Pris: {PrisInfo.TotalTidsPris:N0} DKK" : "";
 
                 Taxatur.MapUrl = $"https://www.google.com/maps/embed/v1/directions?key=AIzaSyAMX2xaib8pawKfNoBlzSSFy5tCzo3RI7g&origin={Taxatur.StartAdresse}&destination={Taxatur.SlutAdresse}";
 
