@@ -16,7 +16,6 @@ namespace TaxaApp.Kode
             public string? DistanceText { get; set; }
             public string? DurationText { get; set; }
 
-
         }
 
         public PrisInformation UdregnPris(Taxatur taxatur, double distanceIKm, double durationIMin)
@@ -70,39 +69,37 @@ namespace TaxaApp.Kode
                 prisInfo.TotalTidsPris += 350;
             }
 
-
             return prisInfo;
-
         }
 
         private bool ErDagtimer(DateTime tidspunkt)
         {
-            
+
             if (tidspunkt.Month == 12 && tidspunkt.Day == 24 || tidspunkt.Month == 12 && tidspunkt.Day == 31)
             {
                 return false;
             }
 
-            
-            
+
+
             if (tidspunkt.DayOfWeek >= DayOfWeek.Monday && tidspunkt.DayOfWeek <= DayOfWeek.Friday)
             {
                 if (tidspunkt.Hour >= 6 && tidspunkt.Hour < 18)
                 {
-                    return true; 
+                    return true;
                 }
             }
 
-           
+
             if (tidspunkt.DayOfWeek == DayOfWeek.Saturday || tidspunkt.DayOfWeek == DayOfWeek.Sunday)
             {
-                return false; 
+                return false;
             }
 
             return false;
         }
 
-        
+
         private bool ErJuleaften(DateTime tidspunkt)
         {
             if (tidspunkt.Month == 12 && tidspunkt.Day == 24)

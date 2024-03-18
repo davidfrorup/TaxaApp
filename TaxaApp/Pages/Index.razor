@@ -6,7 +6,10 @@
 @inject IJSRuntime JSRuntime
 
 
-<iframe width="1200" height="550" style="border:0" loading="lazy" allowfullscreen
+@*<iframe name="iframe_a" width="1200" height="550" style="border:0" loading="lazy" allowfullscreen
+    src="https://www.google.com/maps/embed/v1/view?zoom=11&center=55.6761%2C12.5683&key=AIzaSyAMX2xaib8pawKfNoBlzSSFy5tCzo3RI7g"></iframe>*@
+
+<iframe name="iframe_a" width="1200" height="550" style="border:0" loading="lazy" allowfullscreen
         src="@Taxatur.MapUrl"></iframe>
 
 
@@ -87,14 +90,6 @@
                 double duration = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.duration?.value ?? 0;
 
 
-                //  string distance = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.distance?.value;
-                //  string duration = result?.rows?.FirstOrDefault()?.elements?.FirstOrDefault()?.duration?.value;
-
-
-                //  double distanceIKm = double.Parse(distance?.Replace(" km", "").Replace(".", ","));
-
-                //  double durationIMin = double.Parse(duration?.Replace(" mins", ""));
-
                 double distanceIKm = distance / 1000;
                 double durationIMin = duration / 60;
 
@@ -115,10 +110,8 @@
                 Console.WriteLine($"MinutPris: {PrisInfo.MinutPris}");
                 Console.WriteLine($"TotalPris i km: {PrisInfo.TotalPris}");
                 Console.WriteLine($"TotalPris i min: {PrisInfo.TotalTidsPris}");
-                Console.WriteLine($"Afstand fra API: {distance}");
-                Console.WriteLine($"Afstand fra API: {duration}");
-
-
+                Console.WriteLine($"Afstand fra API: {distance} km");
+                Console.WriteLine($"Afstand fra API: {duration} min");
 
             }
             else
